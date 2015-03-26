@@ -14,6 +14,7 @@ Options:
 
 # Requires python3
 import argparse, sys
+from itertools import groupby
 
 from mw import database
 from mw.lib import reverts
@@ -123,20 +124,12 @@ def get_reverts(start, end, revert_radius=DEFAULT_REVERT_RADIUS, revert_window=D
         {'rev_id': 653553138, 'rev_page': 47898909, 'rev_sha1' : 'zzzc7qgbiunuj1sxz1wmuyaflxwzzzz'}
     ]
 
-    page_revisions = [] #List of revisions retrieved for a given page
     current_page = None #pointer to current page being processed
-
-    for row in cursor:
-        page = row['rev_page']
-        if current_page != None and page != current_page:
-            #We have collected all revisions for the page
-            #Now use the Detector to spot any identical reverts
-            detector = reverts.Detector(radius=revert_radius)
-            for revision in page_revisions:
-                revert = detector.process(revision['rev_sha1'], revision)
-                if revert:
-                    yield revert
-            page_revisions = []
-        else:
-            page_revisions.append(row)
-        current_page = page
+    
+    page_revisions = groupby(cursor, key=lambda r:r['rev_page'])
+    for page_id, revisions in page_revisions:
+        
+        for revert in reverts.detect((r['rev_sha1'], r) for r in revisions):
+            if Timestamp(revert.reverting['rev_timestamp']) >= start and \
+               Timestamp(revert.reverting['rev_timestamp']) <= end:
+                yield revert
