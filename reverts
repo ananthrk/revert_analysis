@@ -1,0 +1,2 @@
+#!/bin/sh
+python -tt -c "from reverts import main; main();" "$@"
