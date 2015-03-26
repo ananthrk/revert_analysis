@@ -96,20 +96,12 @@ def get_reverts(start, end, revert_radius=DEFAULT_REVERT_RADIUS, revert_window=D
 
     query = """
         SELECT r1.rev_id, r1.rev_page, r1.rev_sha1, r1.rev_timestamp FROM revision r1 
-        JOIN
-        (
-            SELECT DISTINCT rev_page FROM revision 
-            WHERE 
-            rev_timestamp >= %s AND rev_timestamp <= %s
-        ) r2
-        ON r1.rev_page = r2.rev_page
-        WHERE
-        r1.rev_timestamp >= %s AND r1.rev_timestamp <= %s
+        WHERE 
+        r1.rev_timestamp >= %s AND r1.rev_timestamp <= %s 
         ORDER BY r1.rev_page, r1.rev_timestamp ASC;
     """
 
-    values = [start.short_format(), end.short_format(), 
-        edit_window_start.short_format(), end.short_format()]
+    values = [edit_window_start.short_format(), end.short_format()]
 
     global db
     #cursor = db.shared_connection.cursor()
