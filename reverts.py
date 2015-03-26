@@ -22,6 +22,8 @@ from mw.types import Timestamp
 DEFAULT_REVERT_RADIUS = 15
 DEFAULT_REVERT_WINDOW = 60*60*24*3 #72 hours
 
+db = None
+
 def main():
     parser = argparse.ArgumentParser(
         description = "Identify reverts that happened in the given time window",
@@ -55,8 +57,9 @@ def main():
     )
 
     args = parser.parse_args()
-    #self.db = database.DB.from_arguments(args)
-
+    global db
+    #db = database.DB.from_arguments(args)
+    
     start = Timestamp(args.start[0])
     if args.end:
         end = Timestamp(args.end)
@@ -107,7 +110,8 @@ def get_reverts(start, end, revert_radius=DEFAULT_REVERT_RADIUS, revert_window=D
     values = [start.short_format(), end.short_format(), 
         edit_window_start.short_format(), end.short_format()]
 
-    #cursor = self.db.shared_connection.cursor()
+    global db
+    #cursor = db.shared_connection.cursor()
     #cursor.execute(query, values)
 
     #FIXME: Just some test values until we get to retrieve actual values from DB
