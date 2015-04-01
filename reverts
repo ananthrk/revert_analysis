@@ -1,2 +1,3 @@
-#!/bin/sh
-python -tt -c "from reverts import main; main();" "$@"
+#!/usr/bin/env python3
+from reverts import main
+main()	
